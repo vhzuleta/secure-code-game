@@ -28,7 +28,7 @@ class TaxPayer:
             pass
 
         # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
+        if path.startswith('/') or '.' in path:
             return None
 
         # builds path
@@ -45,9 +45,11 @@ class TaxPayer:
     def get_tax_form_attachment(self, path=None):
         tax_data = None
 
+        if '..' in path:
+            return None
         if not path:
             raise Exception("Error: Tax form is required for all users")
-
+        
         with open(path, 'rb') as form:
             tax_data = bytearray(form.read())
 

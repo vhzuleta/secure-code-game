@@ -11,6 +11,7 @@ the tests.py again to recreate it.
 
 import sqlite3
 import os
+import re
 from flask import Flask, request
 
 ### Unrelated to the exercise -- Starts here -- Please ignore
@@ -133,13 +134,14 @@ class DB_CRUD_ops(object):
             cur = db_con.cursor()
 
             res = "[METHOD EXECUTED] get_stock_price\n"
-            query = "SELECT price FROM stocks WHERE symbol = '" + stock_symbol + "'"
+            aux = re.match(r"([^;']+)", stock_symbol)
+            query = "SELECT price FROM stocks WHERE symbol = '{}'".format(aux.group(1))
             res += "[QUERY] " + query + "\n"
             if ';' in query:
                 res += "[SCRIPT EXECUTION]\n"
                 cur.executescript(query)
             else:
-                cur.execute(query)
+                cur.execute("SELECT price FROM stocks WHERE symbol = (?)", (aux.group(1),))
                 query_outcome = cur.fetchall()
                 for result in query_outcome:
                     res += "[RESULT] " + str(result) + "\n"
